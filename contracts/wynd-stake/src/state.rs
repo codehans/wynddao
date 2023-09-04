@@ -51,15 +51,12 @@ impl BondingInfo {
     /// Free any tokens which are now considered unlocked
     /// Split locked tokens based on which are expired and assign the remaining ones to locked_tokens
     /// For each unlocked one, add this amount to the stake
-    pub fn free_unlocked_tokens(&mut self, env: &Env) {
+    pub fn free_unlocked_tokens(&mut self, _env: &Env) {
         if self.locked_tokens.is_empty() {
             return;
         }
-        let (unlocked, remaining): (Vec<_>, Vec<_>) = self
-            .locked_tokens
-            .iter()
-            .partition(|(time, _)| time <= &env.block.time);
-        self.locked_tokens = remaining;
+        let unlocked = self.locked_tokens.clone();
+        self.locked_tokens = vec![];
 
         self.stake += unlocked.into_iter().map(|(_, v)| v).sum::<Uint128>();
     }
